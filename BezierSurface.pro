@@ -18,9 +18,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    canvaswidget.cpp
+    canvaswidget.cpp \
+    bezier.cpp
 
 HEADERS  += mainwindow.h \
-    canvaswidget.h
+    canvaswidget.h \
+    bezier.h
 
 FORMS    += mainwindow.ui

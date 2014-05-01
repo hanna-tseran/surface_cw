@@ -6,11 +6,11 @@
 #include <QPoint>
 #include <QTimer>
 #include <QMouseEvent>
-//#include <QVector3D>
 #include <cmath>
-//#include <QMatrix4x4>
-//#include <QMatrix3x3>
 #include <gtc/matrix_transform.hpp>
+#include "bezier.h"
+
+typedef vector<vector<glm::vec3>> Image;
 
 class CanvasWidget : public QGLWidget
 {
@@ -35,8 +35,8 @@ protected:
     float xCurAngle;
     float yCurAngle;
     float curScale;
-    glm::vec3 rotAxis;
-    glm::mat4 modelview;
+    Bezier bezierPatch;
+    Image image;
 
     void paintGL();
     void initializeGL(void);
