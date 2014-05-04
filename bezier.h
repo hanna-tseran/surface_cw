@@ -1,12 +1,7 @@
 #ifndef BEZIER_H
 #define BEZIER_H
 
-#include <QGLWidget>
-#include <glm.hpp>
-#include <vector>
-using std::vector;
-
-typedef vector<vector<glm::vec3>> Image;
+#include "stdafx.h"
 
 class Bezier
 {
@@ -18,17 +13,20 @@ private:
     const int V_STRIDE = 3;//12;
 
     vector< vector<glm::vec3> > ctrlPoints;
+    vector< vector<int> > height;
     int uStride;
     int vStride;
 
-    Image getImage(vector< vector<float> > &height);
+    Patch getPatch(vector< vector<float> > &height);
 
 public:
     Bezier();
 
     void setCtrlPoints(GLfloat ctrlPoints[4][4][3]);
+    void setHeight(vector< vector<int> > height);
     double bernstein(double t, vector<GLfloat> &ctrl);
-    Image generate();
+    Patch generate();
+    Patch generateByHeight();
 
     int getUStride() const;
 //    void setUStride(int value);

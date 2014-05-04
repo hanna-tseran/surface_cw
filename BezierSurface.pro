@@ -19,10 +19,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     canvaswidget.cpp \
-    bezier.cpp
+    bezier.cpp \
+    surface.cpp \
+    heightmap.cpp
 
 HEADERS  += mainwindow.h \
     canvaswidget.h \
-    bezier.h
+    bezier.h \
+    surface.h \
+    stdafx.h \
+    heightmap.h
 
 FORMS    += mainwindow.ui

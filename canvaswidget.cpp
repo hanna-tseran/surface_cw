@@ -10,8 +10,31 @@ CanvasWidget::CanvasWidget(QWidget *parent) :
 {{-1.5, 0.5, 4.0}, {-0.5, 0.5, 0.0},
 {0.5, 0.5, 3.0}, {1.5, 0.5, 4.0}},
 {{-1.5, 1.5, -2.0}, {-0.5, 1.5, -2.0},
-{0.5, 1.5, 0.0}, {1.5, 1.5, -1.0}}
-                                 }
+{0.5, 1.5, 0.0}, {1.5, 1.5, -1.0}}}, ctrlpoints1 {
+{{1.5, -1.5, 2.0}, {2.0, -1.5, 2.0},
+{2.5, -1.5, -1.0}, {3.0, -1.5, 2.0}},
+{{1.5, -0.5, -1.0}, {2.0, -0.5, 3.0},
+{2.5, -0.5, 0.0}, {3.0, -0.5, -1.0}},
+{{1.5, 0.5, 4.0}, {2.0, 0.5, 0.0},
+{2.5, 0.5, 3.0}, {3.0, 0.5, 4.0}},
+{{1.5, 1.5, -1.0}, {2.0, 1.5, -2.0},
+{2.5, 1.5, 0.0}, {3.0, 1.5, -1.0}}}, ctrlpoints2 {
+{{-1.5, 1.5, -2.0}, {-0.5, 1.5, -2.0},
+{0.5, 1.5, 0.0}, {1.5, 1.5, -1.0}},
+{{-1.5, 2.5, 1.0}, {-0.5, 2.5, 3.0},
+{0.5, 2.5, 0.0}, {1.5, 2.5, -1.0}},
+{{-1.5, 3.5, 4.0}, {-0.5, 3.5, 0.0},
+{0.5, 3.5, 3.0}, {1.5, 3.5, 4.0}},
+{{-1.5, 4.5, -2.0}, {-0.5, 4.5, -2.0},
+{0.5, 4.5, 0.0}, {1.5, 4.5, -1.0}}}, ctrlpoints3 {
+{{1.5, 1.5, -1.0}, {2.0, 1.5, -2.0},
+{2.5, 1.5, 0.0}, {3.0, 1.5, -1.0}},
+{{1.5, 2.5, -1.0}, {2.0, 2.5, 3.0},
+{2.5, 2.5, 0.0}, {3.0, 2.5, -1.0}},
+{{1.5, 3.5, 4.0}, {2.0, 3.5, 0.0},
+{2.5, 3.5, 3.0}, {3.0, 3.5, 4.0}},
+{{1.5, 4.5, -1.0}, {2.0, 4.5, -2.0},
+{2.5, 4.5, 0.0}, {3.0, 4.5, -1.0}}}
 {
     timer->start(EXPIRATION_TIME);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -22,8 +45,27 @@ CanvasWidget::CanvasWidget(QWidget *parent) :
     yRotAngle = 0.0;
     curScale = 1.0;
 
-    bezierPatch.setCtrlPoints(ctrlpoints);
-    image = bezierPatch.generate();
+//    Surface surface = Surface(2,2);
+//    bezierPatch.setCtrlPoints(ctrlpoints);
+//    surface.addPatch(bezierPatch.generate(), 0, 0);
+//    bezierPatch.setCtrlPoints(ctrlpoints1);
+//    surface.addPatch(bezierPatch.generate(), 0, 1);
+//    bezierPatch.setCtrlPoints(ctrlpoints2);
+//    surface.addPatch(bezierPatch.generate(), 1, 0);
+//    bezierPatch.setCtrlPoints(ctrlpoints3);
+//    surface.addPatch(bezierPatch.generate(), 1, 1);
+//    surfaceImage = surface.getImage();
+    //bezierPatch.setCtrlPoints(ctrlpoints3);
+    //bezierPatch.setCtrlPoints(ctrlpoints);
+    //patch = bezierPatch.generate();
+
+    HeightMap hm;
+    vector< vector<int> > heightMap = hm.LoadRawFile(MAP_NAME, MAP_SIZE);
+    Surface surface = Surface(1, 1);
+    bezierPatch.setHeight(heightMap);
+    surface.addPatch(bezierPatch.generateByHeight(), 0, 0);
+    surfaceImage = surface.getImage();
+
 }
 
 CanvasWidget::~CanvasWidget() {
@@ -53,18 +95,49 @@ void CanvasWidget::paintGL(void)
 
     for (i = 0; i <= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
         glBegin(GL_LINE_STRIP);
-        for (j = 0; j<= bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
-            glVertex3f(image[i][j].x, image[i][j].y, image[i][j].z);
+        for (j = 0; j<=  bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z/255);
         }
         glEnd();
     }
     for (j = 0; j <= bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
         glBegin(GL_LINE_STRIP);
         for (i = 0; i<= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
-            glVertex3f(image[i][j].x, image[i][j].y, image[i][j].z);
+            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z/255);
         }
         glEnd();
     }
+
+//    for (i = 0; i <= 2 * bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+//        glBegin(GL_LINE_STRIP);
+//        for (j = 0; j<= 2 * bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+//            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z);
+//        }
+//        glEnd();
+//    }
+//    for (j = 0; j <= 2 * bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+//        glBegin(GL_LINE_STRIP);
+//        for (i = 0; i<= 2 * bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+//            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z);
+//        }
+//        glEnd();
+//    }
+
+
+//    for (i = 0; i <= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+//        glBegin(GL_LINE_STRIP);
+//        for (j = 0; j<= bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+//            glVertex3f(patch[i][j].x, patch[i][j].y, patch[i][j].z);
+//        }
+//        glEnd();
+//    }
+//    for (j = 0; j <= bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+//        glBegin(GL_LINE_STRIP);
+//        for (i = 0; i<= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+//            glVertex3f(patch[i][j].x, patch[i][j].y, patch[i][j].z);
+//        }
+//        glEnd();
+//    }
 
     glPopMatrix ();
     glFlush();

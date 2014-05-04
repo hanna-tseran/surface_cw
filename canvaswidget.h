@@ -1,16 +1,15 @@
 #ifndef CANVASWIDGET_H
 #define CANVASWIDGET_H
 
-#include <QGLWidget>
+#include "stdafx.h"
+#include "bezier.h"
+#include "surface.h"
+#include "heightmap.h"
+
 #include <QKeyEvent>
 #include <QPoint>
 #include <QTimer>
 #include <QMouseEvent>
-#include <cmath>
-#include <gtc/matrix_transform.hpp>
-#include "bezier.h"
-
-typedef vector<vector<glm::vec3>> Image;
 
 class CanvasWidget : public QGLWidget
 {
@@ -21,11 +20,16 @@ public:
 
 protected:
 
-    static int const EXPIRATION_TIME = 16;
+    static const int EXPIRATION_TIME = 16;
+    static const int MAP_SIZE = 1024;
+    string MAP_NAME = "heightmap.raw";
 
     int width;
     int height;
     GLfloat ctrlpoints[4][4][3];
+    GLfloat ctrlpoints1[4][4][3];
+    GLfloat ctrlpoints2[4][4][3];
+    GLfloat ctrlpoints3[4][4][3];
     QTimer* timer;
     bool useArcBall;
     QPoint curMousePt;
@@ -36,7 +40,10 @@ protected:
     float yCurAngle;
     float curScale;
     Bezier bezierPatch;
-    Image image;
+    Patch patch;
+    //Surface surface;
+    Patch surfaceImage;
+
 
     void paintGL();
     void initializeGL(void);
