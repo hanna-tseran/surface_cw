@@ -61,10 +61,56 @@ CanvasWidget::CanvasWidget(QWidget *parent) :
 
     HeightMap hm;
     vector< vector<int> > heightMap = hm.LoadRawFile(MAP_NAME, MAP_SIZE);
-    Surface surface = Surface(1, 1);
-    bezierPatch.setHeight(heightMap);
-    surface.addPatch(bezierPatch.generateByHeight(), 0, 0);
+    Surface surface = Surface(PATCHES_NUM, PATCHES_NUM);
+    int iCoef = 0;
+    int jCoef = 0;
+    for (int i = 0; i < PATCHES_NUM; ++i) {
+        jCoef = 0;
+        for (int j = 0; j < PATCHES_NUM; ++j) {
+            vector< vector<int> > patchHeightMap;
+//            iCoef = i > 0 ? -1 : 0;
+//            jCoef = j > 0 ? -1 : 0;
+
+            for (int iP = 0; iP < PATCH_SIZE; ++iP) {
+                vector<int> row;
+                row.resize(PATCH_SIZE);
+                for (int jP = 0; jP < PATCH_SIZE; ++jP) {
+                    row[jP] = heightMap[i*PATCH_SIZE + iP + iCoef][j*PATCH_SIZE + jP + jCoef];
+                }
+                patchHeightMap.push_back(row);
+            }
+
+//            for (; iP < iBound; ++iP) {
+//                vector<int> row;
+//                row.resize(PATCH_SIZE);
+//                for (; jP < jBound; ++jP) {
+//                    row[jP] = heightMap[i*PATCH_SIZE + iP][j*PATCH_SIZE + jP];
+//                }
+//                patchHeightMap.push_back(row);
+//            }
+
+//            for (int iP = 0; iP < PATCH_SIZE; ++iP) {
+//                vector<int> row;
+//                row.resize(PATCH_SIZE);
+//                for (int jP = 0; jP < PATCH_SIZE; ++jP) {
+//                    row[jP] = heightMap[i*PATCH_SIZE + iP][j*PATCH_SIZE + jP];
+//                }
+//                patchHeightMap.push_back(row);
+//            }
+            bezierPatch.setHeight(patchHeightMap);
+            surface.addPatch(bezierPatch.generateByHeight(), i, j);
+            --jCoef;
+        }
+        --iCoef;
+    }
     surfaceImage = surface.getImage();
+
+//    HeightMap hm;
+//    vector< vector<int> > heightMap = hm.LoadRawFile(MAP_NAME, MAP_SIZE);
+//    Surface surface = Surface(1, 1);
+//    bezierPatch.setHeight(heightMap);
+//    surface.addPatch(bezierPatch.generateByHeight(), 0, 0);
+//    surfaceImage = surface.getImage();
 
 }
 
@@ -93,20 +139,36 @@ void CanvasWidget::paintGL(void)
         glRotatef(glm::degrees(yCurAngle), 1.0, 0.0, 0.0);
     }
 
-    for (i = 0; i <= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+    for (i = 0; i <= PATCHES_NUM * bezierPatch.getN() * bezierPatch.getVStride(); i+=4/*++i*/) {
         glBegin(GL_LINE_STRIP);
-        for (j = 0; j<=  bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
-            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z/255);
+        for (j = 0; j<= PATCHES_NUM * bezierPatch.getN() * bezierPatch.getUStride(); j+=4/*++j*/) {
+            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z);
         }
         glEnd();
     }
-    for (j = 0; j <= bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+    for (j = 0; j <= PATCHES_NUM * bezierPatch.getN() * bezierPatch.getUStride(); j+=4/*++j*/) {
         glBegin(GL_LINE_STRIP);
-        for (i = 0; i<= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
-            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z/255);
+        for (i = 0; i<= PATCHES_NUM * bezierPatch.getN() * bezierPatch.getVStride(); i+=4/*++i*/) {
+            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z);
         }
         glEnd();
     }
+
+
+//    for (i = 0; i <= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+//        glBegin(GL_LINE_STRIP);
+//        for (j = 0; j<=  bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+//            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z/255);
+//        }
+//        glEnd();
+//    }
+//    for (j = 0; j <= bezierPatch.getN() * bezierPatch.getUStride(); ++j) {
+//        glBegin(GL_LINE_STRIP);
+//        for (i = 0; i<= bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
+//            glVertex3f(surfaceImage[i][j].x, surfaceImage[i][j].y, surfaceImage[i][j].z/255);
+//        }
+//        glEnd();
+//    }
 
 //    for (i = 0; i <= 2 * bezierPatch.getN() * bezierPatch.getVStride(); ++i) {
 //        glBegin(GL_LINE_STRIP);
@@ -158,11 +220,21 @@ void CanvasWidget::resizeGL(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if (w <= h)
-        glOrtho(-4.0, 4.0, -4.0*(GLfloat)h/(GLfloat)w,
-                4.0*(GLfloat)h/(GLfloat)w, -4.0, 4.0);
+        glOrtho(0.0-250.0 ,
+                250.0*(GLfloat)w/(GLfloat)h + 0.0, 0.0-250.0, 250.0 + 0.0, 0.0 - 300.0, 300.0);
+//        glOrtho(0.0-250.0, 250.0, 0.0-250.0,
+//                250.0*(GLfloat)h/(GLfloat)w , 0.0 - 300.0, 300.0);
     else
-        glOrtho(-4.0*(GLfloat)w/(GLfloat)h,
-                4.0*(GLfloat)w/(GLfloat)h, -4.0, 4.0, -4.0, 4.0);
+        glOrtho(0.0-250.0 ,
+                250.0*(GLfloat)w/(GLfloat)h + 0.0, 0.0-250.0, 250.0 + 0.0, 0.0 - 300.0, 300.0);
+//        glOrtho(0.0-250.0 ,
+//                250.0*(GLfloat)w/(GLfloat)h + 0.0, 0.0-250.0, 250.0 + 0.0, 0.0 - 300.0, 300.0);
+//    if (w <= h)
+//        glOrtho(-4.0, 4.0, -4.0*(GLfloat)h/(GLfloat)w,
+//                4.0*(GLfloat)h/(GLfloat)w, -4.0, 4.0);
+//    else
+//        glOrtho(-4.0*(GLfloat)w/(GLfloat)h,
+//                4.0*(GLfloat)w/(GLfloat)h, -4.0, 4.0, -4.0, 4.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }

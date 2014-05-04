@@ -9,8 +9,8 @@ class Bezier
 private:
     const double C3[4] = {1.0, 3.0, 3.0, 1.0};
     const int N = 3;
-    const int U_STRIDE = 3;
-    const int V_STRIDE = 3;//12;
+    const int U_STRIDE = 1;//3;
+    const int V_STRIDE = 1;//3;//12;
 
     vector< vector<glm::vec3> > ctrlPoints;
     vector< vector<int> > height;

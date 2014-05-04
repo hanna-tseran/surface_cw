@@ -34,6 +34,16 @@ Patch Surface::getImage() {
             for (int i = 0; i < PATCH_SIZE; ++i) {
                 for (int j = 0; j < PATCH_SIZE; ++j) {
                     image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j] = patches[iSurf][jSurf][i][j];
+
+                    image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j].x += jSurf * 3;//ACTUAL_PATCH_SIZE(DEGREE) - 1
+                    image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j].y += iSurf * 3;
+
+
+//                    image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j].x = i*PATCH_SIZE + patches[iSurf][jSurf][i][j].x;
+//                    image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j].y = j*PATCH_SIZE + patches[iSurf][jSurf][i][j].y;
+//                    image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j].z = patches[iSurf][jSurf][i][j].z;
+
+
                     if (iSurf > 0 && jSurf > 0) {
                         if (i == 0 && j == 0) {
                             float sum = 0.0;

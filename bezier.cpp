@@ -119,9 +119,9 @@ Patch Bezier::generateByHeight() {
     preCalc.resize(N+1);
 
     for (int v = 0; v <= N * vStride; ++v) {
-        curY = float(v) / float(N * vStride);
+        curX = float(v) / float(N * vStride);
         for (int u = 0; u <= N * uStride; ++u) {
-            curX = float(u) / float(N * uStride);
+            curY = float(u) / float(N * uStride);
 
             for (int i = 0; i <= N; ++i) {
                 for (int j = 0; j <= N; ++j) {
@@ -132,6 +132,34 @@ Patch Bezier::generateByHeight() {
             newHeight[v][u] = bernstein(curX, preCalc);
         }
     }
+//    vector< vector<float> > newHeight;
+//    vector<float> ctrl;
+//    vector<float> preCalc;
+//    float curX;
+//    float curY;
+
+//    for (int i = 0; i <= N * vStride; ++i) {
+//        vector<float> row;
+//        row.resize((N+1) * uStride);
+//        newHeight.push_back(row);
+//    }
+//    ctrl.resize(N+1);
+//    preCalc.resize(N+1);
+
+//    for (int v = 0; v <= N * vStride; ++v) {
+//        curY = float(v) / float(N * vStride);
+//        for (int u = 0; u <= N * uStride; ++u) {
+//            curX = float(u) / float(N * uStride);
+
+//            for (int i = 0; i <= N; ++i) {
+//                for (int j = 0; j <= N; ++j) {
+//                    ctrl[j] = height[i][j];
+//                }
+//                preCalc[i] = bernstein(curY, ctrl);
+//            }
+//            newHeight[v][u] = bernstein(curX, preCalc);
+//        }
+//    }
 
     return getPatch(newHeight);
 }
