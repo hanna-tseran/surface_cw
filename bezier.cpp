@@ -1,31 +1,26 @@
 #include "bezier.h"
 
 
-int Bezier::getUStride() const
+int Bezier::getStride() const
 {
-    return uStride;
+    return STRIDE;
 }
 
-//void Bezier::setUStride(int value)
+//void Bezier::setSTRIDE(int value)
 //{
-//    uStride = value;
+//    STRIDE = value;
 //}
 
-int Bezier::getVStride() const
-{
-    return vStride;
-}
-
-//void Bezier::setVStride(int value)
+//void Bezier::setSTRIDE(int value)
 //{
-//    vStride = value;
+//    STRIDE = value;
 //}
 
 int Bezier::getN() const
 {
     return N;
 }
-Bezier::Bezier() : uStride(U_STRIDE), vStride(V_STRIDE)
+Bezier::Bezier()
 {
 }
 
@@ -77,18 +72,18 @@ Patch Bezier::generate() {
     float curX;
     float curY;
 
-    for (int i = 0; i <= N * vStride; ++i) {
+    for (int i = 0; i <= N * STRIDE; ++i) {
         vector<float> row;
-        row.resize((N+1) * uStride);
+        row.resize((N+1) * STRIDE);
         height.push_back(row);
     }
     ctrl.resize(N+1);
     preCalc.resize(N+1);
 
-    for (int v = 0; v <= N * vStride; ++v) {
-        curY = float(v) / float(N * vStride);
-        for (int u = 0; u <= N * uStride; ++u) {
-            curX = float(u) / float(N * uStride);
+    for (int v = 0; v <= N * STRIDE; ++v) {
+        curY = float(v) / float(N * STRIDE);
+        for (int u = 0; u <= N * STRIDE; ++u) {
+            curX = float(u) / float(N * STRIDE);
 
             for (int i = 0; i <= N; ++i) {
                 for (int j = 0; j <= N; ++j) {
@@ -110,18 +105,18 @@ Patch Bezier::generateByHeight() {
     float curX;
     float curY;
 
-    for (int i = 0; i <= N * vStride; ++i) {
+    for (int i = 0; i <= N * STRIDE; ++i) {
         vector<float> row;
-        row.resize((N+1) * uStride);
+        row.resize((N+1) * STRIDE);
         newHeight.push_back(row);
     }
     ctrl.resize(N+1);
     preCalc.resize(N+1);
 
-    for (int v = 0; v <= N * vStride; ++v) {
-        curX = float(v) / float(N * vStride);
-        for (int u = 0; u <= N * uStride; ++u) {
-            curY = float(u) / float(N * uStride);
+    for (int v = 0; v <= N * STRIDE; ++v) {
+        curX = float(v) / float(N * STRIDE);
+        for (int u = 0; u <= N * STRIDE; ++u) {
+            curY = float(u) / float(N * STRIDE);
 
             for (int i = 0; i <= N; ++i) {
                 for (int j = 0; j <= N; ++j) {
@@ -138,18 +133,18 @@ Patch Bezier::generateByHeight() {
 //    float curX;
 //    float curY;
 
-//    for (int i = 0; i <= N * vStride; ++i) {
+//    for (int i = 0; i <= N * STRIDE; ++i) {
 //        vector<float> row;
-//        row.resize((N+1) * uStride);
+//        row.resize((N+1) * STRIDE);
 //        newHeight.push_back(row);
 //    }
 //    ctrl.resize(N+1);
 //    preCalc.resize(N+1);
 
-//    for (int v = 0; v <= N * vStride; ++v) {
-//        curY = float(v) / float(N * vStride);
-//        for (int u = 0; u <= N * uStride; ++u) {
-//            curX = float(u) / float(N * uStride);
+//    for (int v = 0; v <= N * STRIDE; ++v) {
+//        curY = float(v) / float(N * STRIDE);
+//        for (int u = 0; u <= N * STRIDE; ++u) {
+//            curX = float(u) / float(N * STRIDE);
 
 //            for (int i = 0; i <= N; ++i) {
 //                for (int j = 0; j <= N; ++j) {
@@ -164,46 +159,51 @@ Patch Bezier::generateByHeight() {
     return getPatch(newHeight);
 }
 
+
+//int Bezier::getSTRIDE() const
+//{
+//    return STRIDE;
+//}
 Patch Bezier::getPatch(vector< vector<float> > &height) {
     Patch patch;
     int i = 0;
     int j = 0;
-    for (i = 0; i <= N * vStride; ++i) {
+    for (i = 0; i <= N * STRIDE; ++i) {
         vector<glm::vec3> row;
-        row.resize((N + 1) * uStride);
+        row.resize((N + 1) * STRIDE);
         patch.push_back(row);
     }
 
     for (i = 0; i < N; ++i) {
         float curY = i;
         float nextY = i+1;
-        for (int k = 0; k < vStride; ++k) {
-            float newY = curY + k * (nextY - curY) / uStride;
-            for (j = 0; j <= N * uStride; ++j) {
-                patch[i * vStride + k][j].y = newY;
+        for (int k = 0; k < STRIDE; ++k) {
+            float newY = curY + k * (nextY - curY) / STRIDE;
+            for (j = 0; j <= N * STRIDE; ++j) {
+                patch[i * STRIDE + k][j].y = newY;
             }
         }
     }
-    for (j = 0; j <= N * uStride; ++j) {
-        patch[i * vStride][j].y = i;
+    for (j = 0; j <= N * STRIDE; ++j) {
+        patch[i * STRIDE][j].y = i;
     }
 
     for (j = 0; j < N; ++j) {
         float curX = j;
         float nextX = j+1;
-        for (int k = 0; k < uStride; ++k) {
-            float newX = curX + k * (nextX - curX) / vStride;
-            for (i = 0; i <= N * vStride; ++i) {
-                patch[i][j * uStride + k].x = newX;
+        for (int k = 0; k < STRIDE; ++k) {
+            float newX = curX + k * (nextX - curX) / STRIDE;
+            for (i = 0; i <= N * STRIDE; ++i) {
+                patch[i][j * STRIDE + k].x = newX;
             }
         }
     }
-    for (i = 0; i <= N * vStride; ++i) {
-        patch[i][j * uStride].x = j;
+    for (i = 0; i <= N * STRIDE; ++i) {
+        patch[i][j * STRIDE].x = j;
     }
 
-    for (i = 0; i <= N * vStride; ++i) {
-        for (j = 0; j<= N * uStride; ++j) {
+    for (i = 0; i <= N * STRIDE; ++i) {
+        for (j = 0; j<= N * STRIDE; ++j) {
             patch[i][j].z = height[i][j];
         }
     }
@@ -215,42 +215,42 @@ Patch Bezier::getPatch(vector< vector<float> > &height) {
 //    Patch patch;
 //    int i = 0;
 //    int j = 0;
-//    for (i = 0; i <= N * vStride; ++i) {
+//    for (i = 0; i <= N * STRIDE; ++i) {
 //        vector<glm::vec3> row;
-//        row.resize((N + 1) * uStride);
+//        row.resize((N + 1) * STRIDE);
 //        patch.push_back(row);
 //    }
 
 //    for (i = 0; i < N; ++i) {
 //        float curY = ctrlPoints[i][0][1];
 //        float nextY = ctrlPoints[i+1][0][1];
-//        for (int k = 0; k < vStride; ++k) {
-//            float newY = curY + k * (nextY - curY) / uStride;
-//            for (j = 0; j <= N * uStride; ++j) {
-//                patch[i * vStride + k][j].y = newY;
+//        for (int k = 0; k < STRIDE; ++k) {
+//            float newY = curY + k * (nextY - curY) / STRIDE;
+//            for (j = 0; j <= N * STRIDE; ++j) {
+//                patch[i * STRIDE + k][j].y = newY;
 //            }
 //        }
 //    }
-//    for (j = 0; j <= N * uStride; ++j) {
-//        patch[i * vStride][j].y = ctrlPoints[i][0][1];
+//    for (j = 0; j <= N * STRIDE; ++j) {
+//        patch[i * STRIDE][j].y = ctrlPoints[i][0][1];
 //    }
 
 //    for (j = 0; j < N; ++j) {
 //        float curX = ctrlPoints[0][j][0];
 //        float nextX = ctrlPoints[0][j+1][0];
-//        for (int k = 0; k < uStride; ++k) {
-//            float newX = curX + k * (nextX - curX) / vStride;
-//            for (i = 0; i <= N * vStride; ++i) {
-//                patch[i][j * uStride + k].x = newX;
+//        for (int k = 0; k < STRIDE; ++k) {
+//            float newX = curX + k * (nextX - curX) / STRIDE;
+//            for (i = 0; i <= N * STRIDE; ++i) {
+//                patch[i][j * STRIDE + k].x = newX;
 //            }
 //        }
 //    }
-//    for (i = 0; i <= N * vStride; ++i) {
-//        patch[i][j * uStride].x = ctrlPoints[0][j][0];
+//    for (i = 0; i <= N * STRIDE; ++i) {
+//        patch[i][j * STRIDE].x = ctrlPoints[0][j][0];
 //    }
 
-//    for (i = 0; i <= N * vStride; ++i) {
-//        for (j = 0; j<= N * uStride; ++j) {
+//    for (i = 0; i <= N * STRIDE; ++i) {
+//        for (j = 0; j<= N * STRIDE; ++j) {
 //            patch[i][j].z = height[i][j];
 //        }
 //    }

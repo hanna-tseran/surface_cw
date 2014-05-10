@@ -21,17 +21,14 @@ public:
 protected:
 
     static const int EXPIRATION_TIME = 16;
-    static const int MAP_SIZE = 256;//1024;
+    static const int MAP_SIZE = 256;//1024;//256
     static const int PATCH_SIZE = 4;
-    static const int PATCHES_NUM = 50;//10;
-    string MAP_NAME = "heightmap.raw";
+    static const int PATCHES_NUM = (MAP_SIZE - 1) / (PATCH_SIZE - 1);
+    static const int SURFACE_STRIDE = 8;
+    string MAP_NAME = "heightmap-small.bmp";
 
     int width;
     int height;
-    GLfloat ctrlpoints[4][4][3];
-    GLfloat ctrlpoints1[4][4][3];
-    GLfloat ctrlpoints2[4][4][3];
-    GLfloat ctrlpoints3[4][4][3];
     QTimer* timer;
     bool useArcBall;
     QPoint curMousePt;

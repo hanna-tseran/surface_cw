@@ -5,7 +5,7 @@ HeightMap::HeightMap()
 }
 
 vector< vector<int> > HeightMap::LoadRawFile(string fileName, int mapSize) {
-    fileName = "test.bmp";
+    //fileName = "test.bmp";
     vector <vector<int> > heightMap;
     QImage image(fileName.c_str());
     if ( !image.isNull() )
