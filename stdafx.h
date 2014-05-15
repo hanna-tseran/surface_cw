@@ -10,6 +10,7 @@ using std::string;
 using std::vector;
 
 typedef vector<vector<glm::vec3>> Patch;
+typedef vector<vector<int>> HeightMapPatch;
 
 
 

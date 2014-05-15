@@ -1,15 +1,33 @@
 #include "surface.h"
-
-Surface::Surface()
-{
-}
-
-Surface::Surface(int n, int m) : n(n), m(m)
-{
+void Surface::setNM(int n, int m) {
+    this->n = n;
+    this->m = m;
     for (int i = 0; i < n; ++i) {
         vector<Patch> row;
         row.resize(m);
         patches.push_back(row);
+
+        vector<HeightMapPatch> heightRow;
+        heightRow.resize(m);
+        rawHeights.push_back(heightRow);
+    }
+}
+
+Surface::Surface()
+{
+    recalculate = false;
+}
+
+Surface::Surface(int n, int m) : n(n), m(m){
+    recalculate = false;
+    for (int i = 0; i < n; ++i) {
+        vector<Patch> row;
+        row.resize(m);
+        patches.push_back(row);
+
+        vector<HeightMapPatch> heightRow;
+        heightRow.resize(m);
+        rawHeights.push_back(heightRow);
     }
 }
 
@@ -18,8 +36,12 @@ void Surface::addPatch(Patch patch, int i, int j) {
     patches[i][j] = patch;
 }
 
+void Surface::addHeightMap(HeightMapPatch hmp, int i, int j) {
+    rawHeights[i][j] = hmp;
+}
+
 Patch Surface::getImage() {
-    if(image.size() != 0) {
+    if(image.size() != 0 && !recalculate) {
         return image;
     }
 
@@ -31,6 +53,9 @@ Patch Surface::getImage() {
 
     for (int iSurf = 0; iSurf < n; ++iSurf) {
         for (int jSurf = 0; jSurf < m; ++jSurf) {
+            if(iSurf == 5 && jSurf == 7 ) {
+                int a = 5;
+            }
             for (int i = 0; i < PATCH_SIZE; ++i) {
                 for (int j = 0; j < PATCH_SIZE; ++j) {
                     image[iSurf*(PATCH_SIZE-1) + i][jSurf*(PATCH_SIZE-1) + j] = patches[iSurf][jSurf][i][j];
@@ -74,4 +99,79 @@ Patch Surface::getImage() {
         }
     }
     return image;
+}
+
+Patch Surface::modifyHeight(glm::vec3 point) {
+    int xCoord = 0;
+    int yCoord = 0;
+    int zDiff = point.z;
+
+    ///////////////////////
+    ///very stupid!!!
+
+    ////Important!!!
+    if (image[0][0].x > point.x || image[0][image[0].size()-1].x < point.x) {
+        return getImage();
+    }
+
+    //find x
+    while (xCoord < image[0].size()-1 && !(image[0][xCoord].x <= point.x && image[0][xCoord+1].x > point.x)) {
+        ++xCoord;
+    }
+
+    ////Important!!!
+    if (image[0][0].y > point.y || image[image[0].size()-1][0].y < point.y) {
+        return getImage();
+    }
+
+    //find y
+    while (yCoord < image.size() && !(image[yCoord][0].y <= point.y && image[yCoord+1][0].y > point.y)) {
+        ++yCoord;
+    }
+
+    ///very stupid!!!
+    ///////////////////////
+
+    //find patches and indexies in them
+    int xPatch = xCoord / (PATCH_SIZE - 1);
+    int xInPatch;
+    if (xPatch > patches[0].size()) {
+        --xPatch;
+        xInPatch = PATCH_SIZE - 1;
+    }
+    else {
+        xInPatch = xCoord % (PATCH_SIZE - 1);
+    }
+
+    int yPatch = yCoord / (PATCH_SIZE - 1);
+    int yInPatch;
+    if (yPatch > patches.size()) {
+        --yPatch;
+        yInPatch = PATCH_SIZE - 1;
+    }
+    else {
+        yInPatch = yCoord % (PATCH_SIZE - 1);
+    }
+
+//    xPatch = 5;
+//    yPatch = 7;
+//    xInPatch = 1;
+//    yInPatch = 2;
+//    zDiff = 83;
+
+    HeightMapPatch oldHMP = rawHeights[xPatch][yPatch];
+    rawHeights[xPatch][yPatch][xInPatch][yInPatch] += zDiff;
+    Bezier bezierPatch;
+    bezierPatch.setHeight(rawHeights[xPatch][yPatch]);
+    HeightMapPatch newHMP = rawHeights[xPatch][yPatch];
+    Patch oldP = patches[xPatch][yPatch];
+    Patch newP = bezierPatch.generateByHeight();
+    patches[xPatch][yPatch] = bezierPatch.generateByHeight();
+
+    ///////////////////////
+    ///very stupid!!!
+    recalculate = true;
+    return getImage();
+    ///very stupid!!!
+    ///////////////////////
 }

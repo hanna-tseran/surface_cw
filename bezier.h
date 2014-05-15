@@ -25,6 +25,8 @@ public:
     Patch generate();
     Patch generateByHeight();
 
+
+
     int getN() const;
     int getStride() const;
 };

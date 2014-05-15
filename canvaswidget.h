@@ -10,6 +10,7 @@
 #include <QPoint>
 #include <QTimer>
 #include <QMouseEvent>
+#include <GL/glu.h>
 
 class CanvasWidget : public QGLWidget
 {
@@ -21,18 +22,21 @@ public:
 protected:
 
     static const int EXPIRATION_TIME = 16;
-    static const int MAP_SIZE = 256;//1024;//256
+    static const int MAP_SIZE = 64;//1024;//256
     static const int PATCH_SIZE = 4;
     static const int PATCHES_NUM = (MAP_SIZE - 1) / (PATCH_SIZE - 1);
-    static const int SURFACE_STRIDE = 8;
-    string MAP_NAME = "heightmap-small.bmp";
+    static const int SURFACE_STRIDE = 1;//8;
+    string MAP_NAME = "test64.bmp";
 
     int width;
     int height;
     QTimer* timer;
     bool useArcBall;
+    bool modifyHeight;
     QPoint curMousePt;
     QPoint lastMousePt;
+    glm::vec3 lastOGLPt;
+    glm::vec3 curOGLPt;
     float xRotAngle;
     float yRotAngle;
     float xCurAngle;
@@ -40,9 +44,12 @@ protected:
     float curScale;
     Bezier bezierPatch;
     Patch patch;
-    //Surface surface;
+    Surface surface = Surface();
     Patch surfaceImage;
 
+    int temp_total;
+
+    glm::vec3 getOpenGLCoord(QPoint);
 
     void paintGL();
     void initializeGL(void);
