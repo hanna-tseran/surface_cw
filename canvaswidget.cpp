@@ -109,11 +109,15 @@ void CanvasWidget::resizeGL(int w, int h)
     if (w <= h) {
         glOrtho(-MAP_SIZE, MAP_SIZE*(GLfloat)w/(GLfloat)h, -MAP_SIZE, MAP_SIZE,
                 -curScale*fmax(300.0, MAP_SIZE + 50.0), curScale*fmax(300.0, MAP_SIZE + 50.0));
+        width = MAP_SIZE*(GLfloat)w/(GLfloat)h;
+        height = MAP_SIZE;
     }
     else {
         glOrtho(-MAP_SIZE ,
                 MAP_SIZE*(GLfloat)w/(GLfloat)h, -MAP_SIZE, MAP_SIZE,
                 -10*fmax(300.0, MAP_SIZE + 50.0), 10*fmax(300.0, MAP_SIZE + 50.0));
+        width = MAP_SIZE*(GLfloat)w/(GLfloat)h;
+        height = MAP_SIZE;
     }
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -161,6 +165,10 @@ void CanvasWidget::mousePressEvent(QMouseEvent* event) {
     else if (event->button() == Qt::RightButton) {
         curMousePt = lastMousePt = event->pos();
         curOGLPt = lastOGLPt = getOpenGLCoord(curMousePt);
+//        while (curOGLPt.x < -width || curOGLPt.x > width ||
+//               curOGLPt.y < -height || curOGLPt.y > height) {
+//            curOGLPt = lastOGLPt = getOpenGLCoord(curMousePt);
+//        }
         modifyHeight = true;
     }
 }
@@ -201,11 +209,12 @@ void CanvasWidget::wheelEvent(QWheelEvent* event) {
     }
 }
 
-glm::vec3 CanvasWidget::getOpenGLCoord(QPoint point2D) {    
+glm::vec3 CanvasWidget::getOpenGLCoord(QPoint point2D) {
    // glLoadIdentity();
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glColor3f(1.0, 1.0, 1.0);
+
     glPushMatrix ();
     //glLoadIdentity();
     //glLoadIdentity();
@@ -228,6 +237,13 @@ glm::vec3 CanvasWidget::getOpenGLCoord(QPoint point2D) {
     winY = (float)viewport[3] - (float)point2D.ry();
     glReadPixels( point2D.rx(), int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
     //glReadPixels( point2D.rx(), int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+    while (winZ >= 1) {
+        winZ -= 0.5;
+    }
+
+    while (winZ <= -1) {
+        winZ += 0.5;
+    }
 
     gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
