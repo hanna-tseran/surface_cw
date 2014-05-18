@@ -40,7 +40,7 @@ void Bezier::setCtrlPoints(GLfloat ctrlPoints[4][4][3]) {
 }
 
 
-void Bezier::setHeight(vector< vector<int> > height) {
+void Bezier::setHeight(HeightMapPatch height) {
     for (int i = 0; i <= N; ++i) {
         vector<int> row;
         row.resize(N+1);

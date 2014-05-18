@@ -20,7 +20,7 @@ public:
     Bezier();
 
     void setCtrlPoints(GLfloat ctrlPoints[4][4][3]);
-    void setHeight(vector< vector<int> > height);
+    void setHeight(HeightMapPatch height);
     double bernstein(double t, vector<GLfloat> &ctrl);
     Patch generate();
     Patch generateByHeight();

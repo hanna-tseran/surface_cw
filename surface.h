@@ -22,7 +22,7 @@ public:
     void addHeightMap(HeightMapPatch hmp, int i, int j) ;
     Patch getImage();
     void setNM(int n, int m);
-    Patch modifyHeight(glm::vec3);
+    Patch modifyHeight(glm::vec3, int radius);
 };
 
 #endif // SURFACE_H

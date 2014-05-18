@@ -12,6 +12,21 @@
 #include <QMouseEvent>
 #include <GL/glu.h>
 
+//struct PatchBounds {
+//    QPoint upperLeft;
+//    QPoint upperRight;
+//    QPoint bottomLeft;
+//    QPoint bottomRight;
+//};
+
+struct Color {
+    GLfloat red;
+    GLfloat green;
+    GLfloat blue;
+
+    Color( GLfloat red, GLfloat green, GLfloat blue) : red(red), green(green), blue(blue) {}
+};
+
 class CanvasWidget : public QGLWidget
 {
     Q_OBJECT
@@ -22,17 +37,27 @@ public:
 protected:
 
     static const int EXPIRATION_TIME = 16;
-    static const int MAP_SIZE = 64;//1024;//256
+    static const int MAP_SIZE = 256;//64;//1024;//256
     static const int PATCH_SIZE = 4;
     static const int PATCHES_NUM = (MAP_SIZE - 1) / (PATCH_SIZE - 1);
-    static const int SURFACE_STRIDE = 1;//8;
-    string MAP_NAME = "test64.bmp";
+    static const int SURFACE_STRIDE = 1;//1;//8;
+    string MAP_NAME = "small-plane.bmp";//"heightmap.bmp";//"heightmap.bmp";//"heightmap-small.bmp";//"test64.bmp";//"heightmap.bmp";
+    vector<Color> colors;
 
+    int xMin;
+    int xMax;
+    int yMin;
+    int yMax;
+    int xCenter;
+    int yCenter;
     int width;
     int height;
+    int depth;
     QTimer* timer;
     bool useArcBall;
     bool modifyHeight;
+    bool selectPatch;
+    bool modifyPatchHeight;
     QPoint curMousePt;
     QPoint lastMousePt;
     glm::vec3 lastOGLPt;
@@ -46,10 +71,14 @@ protected:
     Patch patch;
     Surface surface = Surface();
     Patch surfaceImage;
+    //vector<PatchBounds> selectedPatches;
+    vector<QPoint> selectedPatches;
 
     int temp_total;
 
     glm::vec3 getOpenGLCoord(QPoint);
+    void addSelectedPatch(QPoint);
+    //void addSelectedPatch(QPoint);
 
     void paintGL();
     void initializeGL(void);
